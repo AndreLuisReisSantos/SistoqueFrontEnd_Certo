@@ -1,7 +1,12 @@
 import Botoes from "../../../components/Botoes";
-import { inputs, buscarProduto } from "./model";
+import { SelectProdutos } from "../../../components/SelectProduto"
+
+import { inputs } from "./model";
 import { useState } from "react";
 import Swal from 'sweetalert2';
+import { useMutation } from "@apollo/client";
+import { DELETAR_PRODUTO } from './../../../mutation/produto';
+import { TODOS_PRODUTOS } from './../../../components/SelectProduto/index';
 const ExcluirProduto = () => {
   const botoes = [
     {
@@ -12,16 +17,12 @@ const ExcluirProduto = () => {
   ];
 
   const [inputsReact, setInputReact] = useState(inputs);
-
-  const mudarValueInput = (e, input) => {
-    const htmlInputs = e.target;
-    input.value = htmlInputs.value;
-    const inputsAtualizados = inputsReact.map((inputsReactAtual) => {
-      if (inputsReactAtual.id == input.id) return input;
-      else return inputsReactAtual;
-    });
-    setInputReact(inputsAtualizados)
-  };
+  const [produtoId, setProdutoId] = useState("")
+  const [deletarProduto, { error }] = useMutation(DELETAR_PRODUTO, {
+    refetchQueries: [
+      { query: TODOS_PRODUTOS}
+    ]
+  })
 
   const renderizarCamposReact = () =>
     inputsReact.map((inputAtual) => (
@@ -29,7 +30,7 @@ const ExcluirProduto = () => {
         <label for={inputAtual.name}>{inputAtual.label}:</label>
         <br />
         {
-          inputAtual.type != 'select' && inputAtual.type != "textarea" ? (
+          inputAtual.type !== 'select' && inputAtual.type !== "textarea" ? (
             <input
               placeholder={inputAtual.placeholder}
               name={inputAtual.name}
@@ -39,13 +40,9 @@ const ExcluirProduto = () => {
               value={inputAtual.value}
               disabled={inputAtual.disabled}
               className={inputAtual.classe}
-              onChange={(e) => {
-                mudarValueInput(e, inputAtual)
-              }}
               style={{ border: !inputAtual.valid ? '1px solid red' : '', backgroundColor:!inputAtual.valid ? '#FFC0CB' : ''}}
             />
-          ) :
-            inputAtual.type == "textarea"   ? (
+          ) : (
               <textarea 
               placeholder={inputAtual.placeholder}
               name={inputAtual.name}
@@ -55,66 +52,64 @@ const ExcluirProduto = () => {
               value={inputAtual.value}
               disabled={inputAtual.disabled}
               className={inputAtual.classe}
-              onChange={(e) => {
-                mudarValueInput(e, inputAtual)
-              }}
               style={{ border: !inputAtual.valid ? '1px solid red' : '', backgroundColor:!inputAtual.valid ? '#FFC0CB' : ''}}
             ></textarea>
             )
-          : (
-            <select
-              placeholder={inputAtual.placeholder}
-              name={inputAtual.name}
-              id={inputAtual.id}
-              required={inputAtual.required}
-              value={inputAtual.value}
-              disabled={inputAtual.disabled}
-              className={inputAtual.classe}
-              onChange={(e) => {mudarValueInput(e, inputAtual)}}
-              style={{ border: !inputAtual.valid ? '1px solid red' : '', backgroundColor:!inputAtual.valid ? '#FFC0CB' : ''}}
-            > {
-              (inputAtual.options || []).map((option) => (<option value={option.value}> {option.text} </option>))
-            }</select>
-          )
         }
       </div>
     ));
 
-    const confirmarCamposReact = (e) => {
+    const setInfo = (produto) => {
+      setProdutoId(Number(produto.id))
+      setInputReact((old) => old.map((input) => ({
+        ...input,
+        value: produto[input.name] || "",
+      })))
+
+    }
+
+
+    const confirmarCamposReact = async (e) => {
       e.preventDefault();
       Swal.fire({
           title: "Produto excluido",
           icon: "success"
       })
+    
+        try{
+          await deletarProduto({
+            variables: {
+              produtoId
+            }
+          })
+          Swal.fire({
+            title: "Produto excluido!",
+            icon: "success"
+          })
+          setInputReact(
+            inputsReact.map((input) => ({
+              ...input,
+              value: "" ,
+            })))
+        } catch( errors ) {
+          return Swal.fire({
+            title: 'Ops!',
+            text: error ? error.message : errors.message || errors[0].message,
+            icon: 'error'
+          })
+        }
+         
+      
     }
 
-    const renderizarCamposBuscarProdutoReact = () =>
-      buscarProduto.map((BuscarProdutoAtual) => (
-        <div className="itemFormulario">
-          <label for={BuscarProdutoAtual.name}>{BuscarProdutoAtual.label}:</label>
-          <br />
-          <select
-            placeholder={BuscarProdutoAtual.placeholder}
-            name={BuscarProdutoAtual.name}
-            id={BuscarProdutoAtual.id}
-            required={BuscarProdutoAtual.required}
-            value={BuscarProdutoAtual.value}
-            className={BuscarProdutoAtual.classe}
-            disabled={BuscarProdutoAtual.disabled}
-  
-          />
-        </div>
-      ));
 
   return (
     <div className="Formulario">
       <h2>Editar Produto</h2>
       <fieldset>
-        {/*renderizarCampos()*/}
-        {renderizarCamposBuscarProdutoReact()}
+        <SelectProdutos onSelectProduto={setInfo}></SelectProdutos>
       </fieldset>
       <fieldset>
-        {/*renderizarCampos()*/}
         {renderizarCamposReact()}
       </fieldset>
       <Botoes botoes={botoes} />

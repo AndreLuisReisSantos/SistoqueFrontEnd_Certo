@@ -7,26 +7,13 @@ export const inputs = [
       value: "",
       type: "text",
       required: true,
-      classe: "input_tamanho5",
+      classe: "input_tamanho2",
       valid : true,
       disabled : false,
     },
     {
-      name: "categoria",
-      id: "categoria",
-      label: "Categoria",
-      placeholder: "Selecione a Categoria",
-      value: "",
-      type: "select",
-      required: true,
-      classe: "input_tamanho3",
-      valid : true,
-      disabled : false,
-    },
-    
-    {
-      name: "volume",
-      id: "volume",
+      name: "unidadeMedida",
+      id: "unidadeMedida",
       label: "Volume",
       placeholder: "Volume",
       value: "",
@@ -35,20 +22,10 @@ export const inputs = [
       classe: "input_tamanho2",
       valid : true,
       disabled : false,    
-    },{
-      name: "localArmazenamento",
-      id: "localArmazenamento",
-      label: "Local do Armazenamento",
-      placeholder: "Local do Armazenamento",
-      value: "",
-      type: "text",
-      required: true,
-      classe: "input_tamanho2",
-      valid : true,
-      disabled : false,    
-    },{
-      name: "descricaoProduto",
-      id: "descricaoProduto",
+    },
+    {
+      name: "descricao",
+      id: "descricao",
       label: "Descrição do Produto",
       placeholder: "Descrição do Produto",
       value: "",
@@ -58,18 +35,3 @@ export const inputs = [
       valid : true,
       disabled : false,
     },];
-
-export const buscarProduto = [
-    {
-      name: "BuscarProduto",
-      id: "BuscarProduto",
-      label: "Selecione um Produto",
-      placeholder: "Selecione um Produto",
-      value: "",
-      required: true,
-      classe: "input_tamanho1",
-      valid : true,
-      disabled : false,
-
-    },
-  ];

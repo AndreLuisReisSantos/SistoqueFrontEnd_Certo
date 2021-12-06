@@ -1,87 +1,16 @@
-//import Botoes from "../../../components/Botoes";
-import { inputs, inputsEndereco, buscarFornecedor } from "./model";
+
+import { inputs, inputsEndereco } from "./model";
+import { SelectFornecedor } from "../../../components/SelectFornecedor"
+
 import { useState } from "react";
 
 const ConsultarFornecedor = () => {
 
-  const renderizarCampos = () =>
-    inputs.map((inputAtual) => (
-      <div className="itemFormulario">
-        <label for={inputAtual.name}>{inputAtual.label}:</label>
-        <br />
-        <input
-          placeholder={inputAtual.placeholder}
-          name={inputAtual.name}
-          id={inputAtual.id}
-          type={inputAtual.type}
-          required={inputAtual.required}
-        />
-      </div>
-    ));
-
-  const renderizarCamposEndereco = () =>
-    inputsEndereco.map((inputEnderecoAtual) => (
-      <div className="itemFormulario">
-        <label for={inputEnderecoAtual.name}>{inputEnderecoAtual.label}:</label>
-        <br />
-        <input
-          placeholder={inputEnderecoAtual.placeholder}
-          name={inputEnderecoAtual.name}
-          id={inputEnderecoAtual.id}
-          type={inputEnderecoAtual.type}
-          required={inputEnderecoAtual.required}
-        />
-      </div>
-    ));
-
-  const limparCampos = (e) => {
-    //e.preventDefault();
-
-    inputs.map((input) => {
-      document.getElementById(input.id).value = "";
-    });
-
-    inputsEndereco.map((input) => {
-      document.getElementById(input.id).value = "";
-    });
-  };
-
-  const confirmarCampos = (e) => {
-    //e.preventDefault();
-
-    inputs.map((input) => {
-      const htmlInputs = document.getElementById(input.id);
-      if (htmlInputs.value != "") {
-        alert("Item Cadastrado com sucesso");
-      } else {
-        htmlInputs.style = "border: 1px solid red";
-      }
-    });
-
-    inputsEndereco.map((input) => {
-      const htmlInputsEndereco = document.getElementById(input.id);
-      if (htmlInputsEndereco.value != "") {
-        alert("Item Cadastrado com sucesso");
-      } else {
-        htmlInputsEndereco.style = "border: 1px solid red";
-      }
-    });
-  };
-
-  const [inputsReact, setInputReact] = useState(inputs);
-
-  const mudarValueInput = (e, input) => {
-    const htmlInputs = e.target;
-    input.value = htmlInputs.value;
-    const inputsAtualizados = inputsReact.map((inputsReactAtual) => {
-      if (inputsReactAtual.id == input.id) return input;
-      else return inputsReactAtual;
-    });
-    setInputReact(inputsAtualizados)
-  };
+  const [fornecedorFields, setFornecedorFields] = useState(inputs);
+  const [enderecoFields, setEnderecoFields] = useState(inputsEndereco)
 
   const renderizarCamposReact = () =>
-    inputs.map((inputAtual) => (
+    fornecedorFields.map((inputAtual) => (
       <div className="itemFormulario">
         <label for={inputAtual.name}>{inputAtual.label}:</label>
         <br />
@@ -94,23 +23,12 @@ const ConsultarFornecedor = () => {
           value={inputAtual.value}
           className={inputAtual.classe}
           disabled={inputAtual.disabled}
-          onChange={(e) => mudarValueInput(e, inputAtual)}
         />
       </div>
     ));
 
-  const mudarValueInputEndereco = (e, input) => {
-      const htmlInputs = e.target;
-      input.value = htmlInputs.value;
-      const inputsAtualizados = inputsReact.map((inputsReactAtual) => {
-        if (inputsReactAtual.id == input.id) return input;
-        else return inputsReactAtual;
-      });
-      setInputReact(inputsAtualizados)
-    };
-
   const renderizarCamposEnderecoReact = () =>
-    inputsEndereco.map((inputEnderecoAtual) => (
+    enderecoFields.map((inputEnderecoAtual) => (
       <div className="itemFormulario">
         <label for={inputEnderecoAtual.name}>{inputEnderecoAtual.label}:</label>
         <br />
@@ -123,51 +41,49 @@ const ConsultarFornecedor = () => {
           value={inputEnderecoAtual.value}
           disabled={inputEnderecoAtual.disabled}
           className={inputEnderecoAtual.classe}
-          onChange={(e) => mudarValueInputEndereco(e, inputEnderecoAtual)}
-
         />
       </div>
     ));
 
-    const renderizarCamposBuscarFornecedorReact = () =>
-      buscarFornecedor.map((BuscarFornecedorAtual) => (
-        <div className="itemFormulario">
-          <label for={BuscarFornecedorAtual.name}>{BuscarFornecedorAtual.label}:</label>
-          <br />
-          <select
-            placeholder={BuscarFornecedorAtual.placeholder}
-            name={BuscarFornecedorAtual.name}
-            id={BuscarFornecedorAtual.id}
-            required={BuscarFornecedorAtual.required}
-            value={BuscarFornecedorAtual.value}
-            className={BuscarFornecedorAtual.classe}
-            disabled={BuscarFornecedorAtual.disabled}
-  
-          />
-        </div>
-      ));
-  
-
-    const limparCamposReact = (e) => {
-      e.preventDefault();
-      const camposAtualizados = inputsReact.map((input) => ({...input, value : ''}))
-      setInputReact(camposAtualizados)
+  const setFornecedorInfo = (fornecedor) => {
+    if(!fornecedor) {
+      setFornecedorFields(inputs)
+      setEnderecoFields(inputsEndereco)
+      return 
     }
+    setEnderecoFields(
+      enderecoFields.map((field) => ({
+        ...field,
+        value: fornecedor[field.id] || ''
+      }))
+    )
 
-    const confirmarCamposReact = (e) => {
-      e.preventDefault();
-      const validarCampos = inputsReact.map((input) => ({...input, value : input.valid !== ''}))
-      setInputReact(validarCampos)
-    }
+    setFornecedorFields(
+      fornecedorFields.map(
+        (field) => {
+          if(field.id.includes('representante')) {
+            return ({
+              ...field,
+              value: field.id === 'representante' ? fornecedor.Representante.nome : fornecedor.Representante.celular
+            })    
+          }
+        return ({
+          ...field,
+          value: fornecedor[field.id] || ''
+        })
+      })
+    )
+  }
+  
 
   return (
     <div className="Formulario">
       <fieldset>
-        {/*renderizarCampos()*/}
-        {renderizarCamposBuscarFornecedorReact()}
+        <SelectFornecedor
+          onSelectFornecedor={setFornecedorInfo}
+        />
       </fieldset>
       <fieldset>
-        {/*renderizarCampos()*/}
         {renderizarCamposReact()}
       </fieldset>
       <h3>
@@ -175,9 +91,7 @@ const ConsultarFornecedor = () => {
       </h3>
       <fieldset>
         {renderizarCamposEnderecoReact()}
-        {/*renderizarCamposEndereco()*/}
       </fieldset>
-      {/* <Botoes botoes={botoes} /> */}
     </div>
   );
 };

@@ -1,5 +1,15 @@
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
+
 const MenuPrincipal = () => {
+  const history = useHistory()
+
+  const logout = () => {
+
+    localStorage.clear()
+    history.push("/")
+  }
+
+
   return (
     <div id="menu">
       <div>
@@ -21,11 +31,11 @@ const MenuPrincipal = () => {
             <span className="icon-Estoque">Estoque</span>
             </Link>
             </li>
-            <li>
+            {/* <li>
             <Link to="/sistema/receita/PaginaInicial">
             <span className="icon-Receitas">Receita</span>
             </Link>
-            </li>
+            </li> */}
             <li>
               <Link to="/sistema/fornecedor/PaginaInicial">
               <span className="icon-Fornecedor">Fornecedores</span>
@@ -41,10 +51,10 @@ const MenuPrincipal = () => {
       </div>
 
       <ul className="menuSair">
-        <li>
-          <Link to="/login">
+        <li onClick={logout} style={{ cursor: "pointer"}} >
+          
           <span className="icon-sair">Sair</span>
-          </Link>
+         
         </li>
       </ul>
     </div>

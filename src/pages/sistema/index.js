@@ -1,8 +1,8 @@
 import {
-    BrowserRouter,
     Switch,
     Route,
     useRouteMatch,
+    useHistory
 } from 'react-router-dom'
 import MenuPrincipal from "../../components/MenuPrincipal";
 import { Fornecedor } from '../fornecedor';
@@ -12,9 +12,20 @@ import { Produto } from '../produto';
 import { Receita } from '../receita';
 import { Relatorio } from '../relatorio';
 import { Login } from '../login';
+import { useEffect } from 'react';
 
 export const Sistema = () => {
+    const history = useHistory();
+
     const { path } = useRouteMatch();
+
+    useEffect(() => {
+        console.log(localStorage.getItem("token"))
+        if(localStorage.getItem("token") == null) {
+            history.push("/")
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[])
     
     return (
         <main>
